@@ -345,7 +345,17 @@ const hrisSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchState.fulfilled, (state, action) => {
-        Object.assign(state, action.payload);
+        // PERBAIKAN 2: Tangani Error Payload & Ekstrak objek 'data'
+        if (action.payload?.error) {
+          state.status = "failed";
+          state.error = action.payload.error;
+          return;
+        }
+
+        // Ekstrak properti 'data' (jika ada) sesuai format return dari fungsi normalizeStatePayload
+        const incomingData = action.payload?.data ? action.payload.data : action.payload;
+
+        Object.assign(state, incomingData);
         state.status = "succeeded";
       })
       .addCase(fetchState.rejected, (state, action) => {
